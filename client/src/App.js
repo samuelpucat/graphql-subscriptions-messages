@@ -1,99 +1,52 @@
-import { useQuery, gql, useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { SubscriptionClient } from "subscriptions-transport-ws";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { split, HttpLink } from "@apollo/client";
+import { getMainDefinition } from "@apollo/client/utilities";
+import MessagesPage from "./pages/MessagesPage";
 
-const GET_MESSAGES = gql`
-  query GET_MESSAGES {
-    messages {
-      id
-      text
-      __typename
-    }
-  }
-`;
+// #region [GQL setup]
+const httpLink = new HttpLink({
+  uri: "http://localhost:8080/graphql",
+});
 
-const MESSAGES_SUBSCRIPTION = gql`
-  subscription MESSAGES_SUBSCRIPTION {
-    messages {
-      id
-      text
-      __typename
-    }
-  }
-`;
+const wsLink = new WebSocketLink(
+  new SubscriptionClient("ws://localhost:8080/subscriptions")
+);
 
-const SEND_MESSAGE = gql`
-  mutation SEND_MESSAGE($text: String!) {
-    sendMessage(text: $text) {
-      id
-      text
-      __typename
-    }
-  }
-`;
+// The split function takes three parameters:
+//
+// * A function that's called for each operation to execute
+// * The Link to use for an operation if the function returns a "truthy" value
+// * The Link to use for an operation if the function returns a "falsy" value
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
 
-function AppInner(props) {
-  const { messages, subscribeToMore } = props;
-
-  const [text, setText] = useState("");
-  const [sendMessage, { loading }] = useMutation(SEND_MESSAGE);
-
-  useEffect(() => {
-    const unsubscribe = subscribeToMore({
-      document: MESSAGES_SUBSCRIPTION,
-      updateQuery: (prev, { subscriptionData }) => {
-        const newMessages = [...prev.messages, subscriptionData.data.messages];
-
-        return {
-          ...prev,
-          messages: newMessages,
-        };
-      },
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [subscribeToMore]);
-
-  const handleTextChange = (e) => {
-    setText(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    sendMessage({ variables: { text } });
-    setText("");
-  };
-
-  return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={text} onChange={handleTextChange} />
-        <button type="submit" disabled={loading}>
-          send
-        </button>
-      </form>
-      <ul>
-        {messages.map((message) => {
-          return <li key={message.id}>{message.text}</li>;
-        })}
-      </ul>
-    </div>
-  );
-}
+// Set up our apollo-client to point at the server we created
+// this can be local or a remote endpoint
+const client = new ApolloClient({
+  link: splitLink,
+  cache: new InMemoryCache(),
+});
+// #endregion
 
 function App() {
-  const { loading, error, data, subscribeToMore } = useQuery(GET_MESSAGES);
-
-  if (loading) return "Loading...";
-
-  if (error) return `Error! ${error.message}`;
-
-  if (data == null) return "No data";
-
+  // #region [render]
   return (
-    <AppInner messages={data.messages} subscribeToMore={subscribeToMore} />
+    <ApolloProvider client={client}>
+      <MessagesPage />
+    </ApolloProvider>
   );
+  // #endregion
 }
 
 export default App;
