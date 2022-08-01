@@ -1,0 +1,42 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+	id 'idea'
+}
+
+group = 'com.messages'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	jcenter()
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:8.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	//Required to support subscriptions
+	implementation "io.projectreactor:reactor-core"
+
+	runtimeOnly 'com.graphql-java-kickstart:graphiql-spring-boot-starter:8.0.0'
+	runtimeOnly 'com.h2database:h2'
+
+	testImplementation 'com.graphql-java-kickstart:graphql-spring-boot-starter-test:8.0.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+}
+
+test {
+	useJUnitPlatform()
+}
