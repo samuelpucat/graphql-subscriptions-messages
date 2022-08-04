@@ -1,39 +1,12 @@
-import { useQuery, gql, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import { useCallback } from "react";
 import MessagesForm from "../features/messages/MessagesForm";
 import MessagesList from "../features/messages/MessagesList";
-
-// #region [GQL]
-const GET_MESSAGES = gql`
-  query GET_MESSAGES {
-    messages {
-      id
-      text
-      __typename
-    }
-  }
-`;
-
-const MESSAGES_SUBSCRIPTION = gql`
-  subscription MESSAGES_SUBSCRIPTION {
-    messages {
-      id
-      text
-      __typename
-    }
-  }
-`;
-
-const SEND_MESSAGE = gql`
-  mutation SEND_MESSAGE($text: String!) {
-    sendMessage(text: $text) {
-      id
-      text
-      __typename
-    }
-  }
-`;
-// #endregion
+import {
+  GET_MESSAGES,
+  MESSAGES_SUBSCRIPTION,
+  SEND_MESSAGE,
+} from "./messages.gqls";
 
 function MessagesPage() {
   // #region [hooks]
@@ -67,7 +40,7 @@ function MessagesPage() {
       console.log(result);
     } catch (error) {
       console.log(error);
-      alert("sending message was not successful");
+      alert("Sending message was not successful");
     }
   };
   // #endregion
@@ -82,7 +55,7 @@ function MessagesPage() {
   }
 
   return (
-    <div>
+    <div style={{ padding: "1rem" }}>
       <MessagesForm onSendMessage={handleSendMessage} />
 
       <MessagesList
