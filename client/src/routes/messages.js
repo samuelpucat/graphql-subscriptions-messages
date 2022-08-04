@@ -8,7 +8,7 @@ import {
   SEND_MESSAGE,
 } from "./messages.gqls";
 
-function MessagesPage() {
+function Messages() {
   // #region [hooks]
   const {
     loading: getMessagesLoading,
@@ -67,4 +67,4 @@ function MessagesPage() {
   // #endregion
 }
 
-export default MessagesPage;
+export default Messages;

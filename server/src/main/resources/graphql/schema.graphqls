@@ -8,9 +8,9 @@ type Query {
 }
 
 type Mutation {
-  sendMessage(text: String!): Message
+  sendMessage(text: String!): Message!
 }
 
 type Subscription {
-  messages: Message
+  messages: Message!
 }
