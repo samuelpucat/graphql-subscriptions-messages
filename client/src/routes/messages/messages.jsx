@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@apollo/client";
 import { useCallback } from "react";
-import MessagesForm from "../features/messages/MessagesForm";
-import MessagesList from "../features/messages/MessagesList";
+import MessagesForm from "../../features/messages/MessagesForm";
+import MessagesList from "../../features/messages/MessagesList";
 import {
   GET_MESSAGES,
   MESSAGES_SUBSCRIPTION,
@@ -14,12 +14,12 @@ function Messages() {
     loading: getMessagesLoading,
     error: getMessagesError,
     data: getMessagesData,
-    subscribeToMore,
+    subscribeToMore: getMessagesSubscribeToMore,
   } = useQuery(GET_MESSAGES);
   const [sendMessage] = useMutation(SEND_MESSAGE);
 
   const subscribeToNewMessages = useCallback(() => {
-    return subscribeToMore({
+    return getMessagesSubscribeToMore({
       document: MESSAGES_SUBSCRIPTION,
       updateQuery: (prev, { subscriptionData }) => {
         const newMessages = [...prev.messages, subscriptionData.data.messages];
@@ -30,7 +30,7 @@ function Messages() {
         };
       },
     });
-  }, [subscribeToMore]);
+  }, [getMessagesSubscribeToMore]);
   // #endregion
 
   // #region [handlers]

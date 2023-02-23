@@ -5,6 +5,7 @@ export const GET_MESSAGES = gql`
     messages {
       id
       text
+      oldText
       __typename
     }
   }

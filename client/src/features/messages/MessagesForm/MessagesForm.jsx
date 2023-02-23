@@ -21,13 +21,10 @@ function MessagesForm(props) {
       return;
     }
 
-    try {
-      setSendMessageLoading(true);
-      await onSendMessage(text);
-      setText("");
-    } finally {
-      setSendMessageLoading(false);
-    }
+    setSendMessageLoading(true);
+    await onSendMessage(text);
+    setText("");
+    setSendMessageLoading(false);
   };
   // #endregion
 

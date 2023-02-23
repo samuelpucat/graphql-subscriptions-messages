@@ -19,4 +19,5 @@ public class Message {
     @GeneratedValue
     private Long id;
     private String text;
+    private String oldText;
 }

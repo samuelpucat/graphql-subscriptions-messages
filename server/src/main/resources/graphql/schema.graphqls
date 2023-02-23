@@ -1,16 +1,25 @@
 type Message {
   id: ID!
+  # text of message
   text: String!
+  # old text of message
+  oldText: String @deprecated(reason: "use text")
 }
 
 type Query {
+  """
+  Doc string
+  """
+  # returns all messages
   messages: [Message!]!
 }
 
 type Mutation {
+  # sends new message
   sendMessage(text: String!): Message!
 }
 
 type Subscription {
+  # subscribes to new messages
   messages: Message!
 }
